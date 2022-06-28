@@ -1,5 +1,4 @@
-import { createSlice, createAsyncThunk, createSelector, createEntityAdapter, current } from "@reduxjs/toolkit"
-import { sub } from 'date-fns';
+import { createSlice, createAsyncThunk, createEntityAdapter } from "@reduxjs/toolkit"
 import axios from "axios";
 
 const POSTS_URL = 'http://localhost:3500/posts'
@@ -16,6 +15,7 @@ const initialState = postsAdapter.getInitialState({
     posts: [],
     user: null,
     userStatus: 'idle', //'idle' | 'loading' | 'succeeded' | 'failed'
+    userMessage: '',
     postStatus: 'idle', //'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
     count: 0
@@ -32,17 +32,9 @@ export const selectPostById = createAsyncThunk('posts/showPost', async (postId) 
     return post.data
 })
 
-export const selectUserById = createAsyncThunk('posts/showUser', async (userId) => {
-    const user = await axios.get(`${USERS_URL}/${userId}`)
-    return user.data
-})
-
 export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (loadMore) => {
-    const posts = await axios.get(POSTS_URL+`?_limit=${loadMore}`)
-    //const posts = await axios.get(POSTS_URL)
+    const posts = await axios.get(POSTS_URL+`?_limit=${loadMore}&_sort=id&_order=desc`)
     const users = await axios.get(USERS_URL)
-
-    console.log('POSTS_URL', loadMore)
 
     // експоненциално изменение
     // users.data.map(user => {
@@ -70,26 +62,21 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async (loadMore) 
     return posts.data
 })
 
-export const addNewPost = createAsyncThunk('posts/addNewPost', async (initialPost) => {
-    const response = await axios.post(POSTS_URL, initialPost)
+export const addNewPost = createAsyncThunk('posts/addNewPost', async (post) => {
+    const response = await axios.post(POSTS_URL, post)
+    const user = await axios.get(`${USERS_URL}/${response.data.userId}`)
+
+    response.data.name = user.data.name
+    response.data.position = user.data.position
+    response.data.pic = user.data.pic
+
     return response.data
 })
 
 export const updatePost = createAsyncThunk('posts/updatePost', async (post) => {
     const { id } = post
-    console.log('updatePost id', post)
     try {
         const response = await axios.put(`${POSTS_URL}/${id}`, post)
-        return response.data
-    } catch (err) {
-        return err.message
-    }
-})
-
-export const updateUser = createAsyncThunk('posts/updateUser', async (user) => {
-    const { id } = user;
-    try {
-        const response = await axios.put(`${USERS_URL}/${id}`, user)
         return response.data
     } catch (err) {
         return err.message
@@ -108,7 +95,6 @@ const postsSlice = createSlice({
             .addCase(fetchPosts.fulfilled, (state, action) => {
                 state.status = 'succeeded'
                 state.posts = action.payload
-                console.log('fetchPosts.fulfilled', action.payload)
             })
             .addCase(fetchPosts.rejected, (state, action) => {
                 state.status = 'failed'
@@ -121,22 +107,12 @@ const postsSlice = createSlice({
                     likes: 0,
                     shares: 0
                 }
+                
+                state.posts.unshift(action.payload)
             })
             .addCase(selectPostById.fulfilled, (state, action) => {
                 state.post = action.payload
                 state.postStatus = 'succeeded'
-            })
-            .addCase(selectUserById.fulfilled, (state, action) => {
-                state.user = action.payload
-                state.userStatus = 'succeeded'
-            })
-            .addCase(updateUser.fulfilled, (state, action) => {
-                if (!action.payload?.id) {
-                    console.log('Update could not complete')
-                    console.log(action.payload)
-                    return;
-                }
-                action.payload.date = new Date().toISOString()
             })
             .addCase(updatePost.fulfilled, (state, action) => {
                 if (!action.payload?.id) {
@@ -144,7 +120,7 @@ const postsSlice = createSlice({
                     console.log(action.payload)
                     return;
                 }
-                state.posts[action.payload.id].reactions['like']++
+                //state.posts[action.payload.id].reactions['like']++
             })
     }
 })
@@ -152,9 +128,6 @@ const postsSlice = createSlice({
 export const getPosts = (state) => state.posts.posts
 export const getPostsStatus = (state) => state.posts.status
 export const getPostsError = (state) => state.posts.error
-
-export const getUserById = (state) => state.posts.user
-export const getUserStatus = (state) => state.posts.userStatus
 
 export const getPostById = (state) => state.posts.post
 export const getPostStatus = (state) => state.posts.postStatus

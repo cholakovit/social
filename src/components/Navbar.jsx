@@ -4,7 +4,7 @@ const Navbar = () => {
   return (
     <StyledAppBar>
         <StyledToolbar>
-            <LogoBox variant="div">
+            <LogoBox variant="div" href='/'>
                 <img src="/img/logo.svg" alt='Hack Soft logo' />
             </LogoBox>
             <UserBox>

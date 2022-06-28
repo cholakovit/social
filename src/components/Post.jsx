@@ -1,20 +1,23 @@
-import { Box, CardHeader, IconButton, Divider, Typography, CardContent } from '@mui/material'
+import { Box, CardHeader, IconButton, Divider, CardContent } from '@mui/material'
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined'
 import { StyledCardActions, StyledAvatar, OrangeLike, ArrowIcon, StyledPost, TimePost, SeeMore, CountLikes, 
   OrangeLikeCountContainer, CardTypography, CardActionLabels } from './styles'
 import TimeAgo from './TimeAgo'
-import { useDispatch } from "react-redux";
-import { updatePost } from "../blog/postsSlice";
-import { useState } from 'react';
+import { useDispatch } from "react-redux"
+import { updatePost } from "../blog/postsSlice"
+import { updateUserReactions } from '../blog/usersSlice'
+import { useState } from 'react'
 
 const Post = ({post, flag}) => {
   const dispatch = useDispatch()
-  const [likesCount, setLikesCount] = useState(post?.reactions?.like)
-
+  const [likesCount, setLikesCount] = useState(post?.reactions?.likes)
   const onLike = () => {
     try {
       dispatch(updatePost({ id: post.id, body: post.body, userId: post.userId, date: new Date(), 
-          reactions: { like: post.reactions.like + 1, share: post.reactions.share }}))
+          reactions: { likes: post.reactions.likes + 1, posts: post.reactions.post }}))
+      
+      dispatch(updateUserReactions({ userId: post.userId, reaction: 'likes' }))
+
     } catch(err) {
       console.error('Failed to save the post', err)
     }
@@ -23,9 +26,14 @@ const Post = ({post, flag}) => {
   }
 
   const onShare = () => {
+    // try {
+    //   dispatch(updatePost({ id: post.id, body: post.body, userId: post.userId, date: new Date(), 
+    //       reactions: { like: post.reactions.like, share: post.reactions.share + 1 }}))
 
+    // } catch(err) {
+    //   console.error('Failed to save the post', err)
+    // }
   }
-
 
   return (
     <StyledPost>
@@ -37,7 +45,7 @@ const Post = ({post, flag}) => {
         />
         <CardContent>
             <CardTypography variant="body2">
-              {post?.body}
+              {flag ? post?.body : post?.body.substring(0, 100) + '...' }
             </CardTypography>
             {!flag && <SeeMore href={`${post.id}`}>... see more</SeeMore>}
         </CardContent>

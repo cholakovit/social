@@ -15,7 +15,6 @@ const List = () => {
     const posts = useSelector(getPosts)
 
     useEffect(() => {
-        console.log('status', status)
         if (status === 'idle') {
             dispatch(fetchPosts(loadMore))
             //return () => { ignore = true }

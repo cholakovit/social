@@ -15,7 +15,7 @@ export const UserBox = styled(Box)({
     justifyContent: 'right'
 })
 
-export const LogoBox = styled(Box)({
+export const LogoBox = styled(Link)({
     margin: '10px 30px',
     '& img': {
         width: '248px',
@@ -196,7 +196,7 @@ export const PostFormButtonBox = styled(Box)({
     justifyContent: "flex-end", 
     alignItems: "flex-end",
     'button': {
-        margin: '10px 10px 0 0',
+        margin: '10px 10px 10px 0',
 
     }
 })
@@ -265,4 +265,28 @@ export const StackWrapper  = styled(Stack)({
 
 export const StyledFooter  = styled(Paper)({
     padding: '60px'
+})
+
+
+export const EditFormUserPaper = styled(Paper)({
+    'form': {
+        width: '93%',
+        padding: '20px',
+        margin: '0 0 20px 0'
+    },
+    'input': {
+        padding: '20px 0px 10px 10px',
+        width: '100%!important',
+        margin: '10px 0 ',
+        ':focus': {
+            color: '#FD7500!important'
+        }
+    },
+    'label': {
+        fontWeight: 'bold',
+        ':focus': {
+            color: '#FD7500!important'
+        }
+    }
+
 })
