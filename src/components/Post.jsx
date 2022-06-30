@@ -1,39 +1,38 @@
-import { Box, CardHeader, IconButton, Divider, CardContent } from '@mui/material'
+import { CardHeader, IconButton, Divider, CardContent } from '@mui/material'
 import ThumbUpOutlinedIcon from '@mui/icons-material/ThumbUpOutlined'
-import { StyledCardActions, StyledAvatar, OrangeLike, ArrowIcon, StyledPost, TimePost, SeeMore, CountLikes, 
-  OrangeLikeCountContainer, CardTypography, CardActionLabels } from './styles'
+import { StyledCardActions, StyledAvatar, OrangeLike, ArrowIcon, StyledPost, TimePost, SeeMore, CountLikes, CardTypography,
+  OrangeLikeCountContainer, CardActionLabels, StyledCardActionsButton, StyledCardActionsButtonDisabled } from './styles'
 import TimeAgo from './TimeAgo'
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { updatePost } from "../blog/postsSlice"
-import { updateUserReactions } from '../blog/usersSlice'
-import { useState } from 'react'
+import { updateUserReactions, getUserById } from '../blog/usersSlice'
+import { useState, useEffect } from 'react'
 
 const Post = ({post, flag}) => {
   const dispatch = useDispatch()
-  const [likesCount, setLikesCount] = useState(post?.reactions?.likes)
-  const onLike = () => {
+  const user = useSelector(getUserById)
+  const [likeClicked, setLikeClicked] = useState(0)
+  const [likesCount, setLikesCount] = useState(post?.reactions.likes)
+  const [likedThisPost, setLikedThisPost] = useState(user?.likedPosts?.some(userLikedPost => userLikedPost === post?.id))
+
+  useEffect(() => {
+
+    if(likeClicked == 0) return;
+
     try {
       dispatch(updatePost({ id: post.id, body: post.body, userId: post.userId, date: new Date(), 
-          reactions: { likes: post.reactions.likes + 1, posts: post.reactions.post }}))
-      
-      dispatch(updateUserReactions({ userId: post.userId, reaction: 'likes' }))
+          reactions: { likes: likesCount }}))
+
+      dispatch(updateUserReactions({ userId: post.userId, reaction: 'likes', postId: post.id }))
 
     } catch(err) {
       console.error('Failed to save the post', err)
     }
 
-    setLikesCount(likesCount + 1)
-  }
+    if(likedThisPost == true) setLikedThisPost(false)
+    if(likedThisPost == false) setLikedThisPost(true)
 
-  const onShare = () => {
-    // try {
-    //   dispatch(updatePost({ id: post.id, body: post.body, userId: post.userId, date: new Date(), 
-    //       reactions: { like: post.reactions.like, share: post.reactions.share + 1 }}))
-
-    // } catch(err) {
-    //   console.error('Failed to save the post', err)
-    // }
-  }
+  },[likeClicked])
 
   return (
     <StyledPost>
@@ -57,14 +56,21 @@ const Post = ({post, flag}) => {
         }
         <Divider /> 
         <StyledCardActions>
-            <Box onClick={onLike}>
-              <IconButton aria-label="add to favorites"><ThumbUpOutlinedIcon /></IconButton>
-              <CardActionLabels variant='p'>Like</CardActionLabels>
-            </Box>
-            <Box onClick={onShare}>
+            {((likeClicked !== 1) && Boolean(likedThisPost)) ? 
+              <StyledCardActionsButtonDisabled onClick={ () => { setLikeClicked(1), setLikesCount(likesCount - 1) } }>
+                <IconButton aria-label="like"><ThumbUpOutlinedIcon /></IconButton>
+                <CardActionLabels variant='p'>Liked</CardActionLabels>
+              </StyledCardActionsButtonDisabled>
+              : 
+              <StyledCardActionsButton onClick={ () => { setLikeClicked(2), setLikesCount(likesCount + 1) } }>
+                <IconButton aria-label="like"><ThumbUpOutlinedIcon /></IconButton>
+                <CardActionLabels variant='p'>Like</CardActionLabels>
+              </StyledCardActionsButton>
+            }
+            <StyledCardActionsButton>
               <IconButton aria-label="share"><ArrowIcon /></IconButton>
               <CardActionLabels variant='p'>Share</CardActionLabels>
-            </Box>
+            </StyledCardActionsButton>
         </StyledCardActions>
     </StyledPost>
   )

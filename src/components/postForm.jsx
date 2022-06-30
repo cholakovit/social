@@ -16,7 +16,7 @@ const PostForm = () => {
       if (canSave) {
         try {
           setAddRequestStatus('pending')
-          dispatch(addNewPost({ userId: userId, body: postContent, date: new Date(), reactions: { likes: 0, posts: 0 } }))
+          dispatch(addNewPost({ userId: userId, body: postContent, date: new Date(), reactions: { likes: 0 } }))
 
           dispatch(updateUserReactions({ userId: userId, reaction: 'posts' }))
 

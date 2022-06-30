@@ -13,9 +13,6 @@ const postsAdapter = createEntityAdapter({
 const initialState = postsAdapter.getInitialState({
     status: 'idle', //'idle' | 'loading' | 'succeeded' | 'failed'
     posts: [],
-    user: null,
-    userStatus: 'idle', //'idle' | 'loading' | 'succeeded' | 'failed'
-    userMessage: '',
     postStatus: 'idle', //'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
     count: 0
@@ -75,6 +72,7 @@ export const addNewPost = createAsyncThunk('posts/addNewPost', async (post) => {
 
 export const updatePost = createAsyncThunk('posts/updatePost', async (post) => {
     const { id } = post
+    
     try {
         const response = await axios.put(`${POSTS_URL}/${id}`, post)
         return response.data

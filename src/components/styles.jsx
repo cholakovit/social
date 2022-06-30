@@ -39,6 +39,23 @@ export const StyledCardActions = styled(CardActions)({
     justifyContent: 'space-between'
 })
 
+export const StyledCardActionsButton = styled(Box)({
+    '&:hover span, &:hover button, &:hover svg': {
+        color: '#FD7500',
+        fill: '#FD7500',
+        filter: 'invert(59%) sepia(89%) saturate(4230%) hue-rotate(3deg) brightness(104%) contrast(104%)'
+    }
+})
+
+export const StyledCardActionsButtonDisabled = styled(Box)({
+    '&:hover span, &:hover button, &:hover svg': {
+        color: '#3e3e3e',
+        fill: '#3e3e3e',
+        filter: 'invert(23%) sepia(0%) saturate(3589%) hue-rotate(210deg) brightness(88%) contrast(86%)',
+        cursor: 'not-allowed'
+    }
+})
+
 export const StyledAvatar = styled(Avatar)({
     width: '36px', 
     height: '36px'

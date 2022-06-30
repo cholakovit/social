@@ -28,7 +28,7 @@ const List = () => {
         <FeedBox>
             <PostForm />
             {error ? <p>{error}</p> : 
-            status === 'loadling' ? 
+            !posts || status === 'loadling' ? 
                 <Loading /> : 
                 posts?.map(post => <Post post={post} key={post.id} />)
             }

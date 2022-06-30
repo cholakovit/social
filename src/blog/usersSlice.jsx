@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createEntityAdapter } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createEntityAdapter, current } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const USERS_URL = 'http://localhost:3500/users'
@@ -9,6 +9,7 @@ const postsAdapter = createEntityAdapter({
 
 const initialState = postsAdapter.getInitialState({
     user: null,
+    likedPosts: [],
     userStatus: 'idle', //'idle' | 'loading' | 'succeeded' | 'failed'
     userMessage: '',
     error: null,
@@ -30,11 +31,20 @@ export const updateUser = createAsyncThunk('posts/updateUser', async (user) => {
 })
 
 export const updateUserReactions = createAsyncThunk('posts/updateUserReaction', async (user) => {
-    const { userId, reaction } = user
+    const { userId, reaction, postId } = user
 
     const selectedUser = await axios.get(`${USERS_URL}/${userId}`)
-    
-    selectedUser.data.reactions[reaction] = selectedUser.data.reactions[reaction] + 1
+
+    const isFound = selectedUser.data.likedPosts.some(id => id === postId)
+    console.log('postId', postId)
+    console.log('isFound', isFound)
+    if(isFound === false) {
+        selectedUser.data.likedPosts.push(postId)  
+        selectedUser.data.reactions[reaction]++
+    }else {
+        selectedUser.data.likedPosts = selectedUser.data.likedPosts.filter(arrPostId => arrPostId !== postId)
+        selectedUser.data.reactions[reaction]--
+    }
 
     try {
         const response = await axios.put(`${USERS_URL}/${selectedUser.data.id}`, selectedUser.data)
@@ -68,6 +78,7 @@ const usersSlice = createSlice({
                 console.log(action.payload)
                 return;
             }
+
             state.user = action.payload
         })
     }

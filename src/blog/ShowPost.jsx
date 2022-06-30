@@ -20,7 +20,7 @@ const ShowPost = () => {
 
     return (
       <FeedBox>
-        <Post post={post} flag={flag} />
+        {post && <Post post={post} flag={flag} />}
         
         <StackWrapper>
             <StyledButton variant="contained" onClick={ () => navigate(-1) }>Back</StyledButton>
