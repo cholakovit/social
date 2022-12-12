@@ -77,7 +77,6 @@ export function useEffectUpdate(
   useEffect(() => {
     if (likeClicked === 0) return;
 
-    try {
       dispatch(
         updatePost({
           id: postId,
@@ -95,9 +94,6 @@ export function useEffectUpdate(
           postId,
         }),
       );
-    } catch (err) {
-      console.error(Constants.FAILED_SAVE_POST_MSG, err);
-    }
 
     if (likedThisPost === true) setLikedThisPost(false);
     if (likedThisPost === false) setLikedThisPost(true);

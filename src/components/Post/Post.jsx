@@ -31,8 +31,6 @@ import TimeAgo from '../TimeAgo/TimeAgo';
 import { updatePost } from '../../store/postsSlice';
 import { updateUserReactions, getUserById } from '../../store/usersSlice';
 
-// Hooks
-
 // Custom Hooks
 import { useEffectUpdate } from '../../hooks/hooks';
 
